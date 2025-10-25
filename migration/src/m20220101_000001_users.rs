@@ -12,7 +12,18 @@ impl MigrationTrait for Migration {
             "users",
             &[
                 ("id", ColType::PkAuto),
-                ("pid", ColType::Uuid),
+                ("email", ColType::StringUniq),
+                ("name", ColType::String),
+            ],
+            &[],
+        )
+        .await?;
+
+        create_table(
+            m,
+            "user_auth",
+            &[
+                ("id", ColType::PkUuid),
                 ("email", ColType::StringUniq),
                 ("password", ColType::String),
                 ("api_key", ColType::StringUniq),
@@ -28,9 +39,10 @@ impl MigrationTrait for Migration {
                 ("magic_link_token", ColType::StringNull),
                 ("magic_link_expiration", ColType::TimestampWithTimeZoneNull),
             ],
-            &[],
+            &[("user", "")],
         )
         .await?;
+
         Ok(())
     }
 
