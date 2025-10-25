@@ -1,11 +1,17 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { auth } from '$lib/stores/auth.svelte';
 
 	let { children } = $props();
 	let mobileMenuOpen = $state(false);
 	let email = $state('');
 	let newsletterStatus = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+	// UI state
+	let userDropdownOpen = $state(false);
 
 	const navItems = [
 		{ href: '/', label: 'Home' },
@@ -15,6 +21,25 @@
 		{ href: '/resources', label: 'Resources' },
 		{ href: '/about', label: 'About' }
 	];
+
+	onMount(() => {
+		// Close dropdown when clicking outside
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
+			if (!target.closest('.user-dropdown')) {
+				userDropdownOpen = false;
+			}
+		};
+
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	});
+
+	async function logout() {
+		auth.logout();
+		userDropdownOpen = false;
+		goto('/');
+	}
 
 	async function handleNewsletterSubmit(e: Event) {
 		e.preventDefault();
@@ -78,6 +103,150 @@
 					</div>
 				</div>
 
+				<!-- Desktop Auth Section -->
+				<div class="hidden md:flex md:items-center md:space-x-4">
+					{#if auth.isAuthenticated}
+						<!-- User Dropdown -->
+						<div class="user-dropdown relative">
+							<button
+								onclick={() => (userDropdownOpen = !userDropdownOpen)}
+								class="flex items-center space-x-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
+							>
+								<div
+									class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-500"
+								>
+									<span class="font-semibold text-white">
+										{auth.user?.name?.charAt(0).toUpperCase() || '?'}
+									</span>
+								</div>
+								<span>{auth.user?.name}</span>
+								<svg
+									class="h-4 w-4 transition-transform {userDropdownOpen ? 'rotate-180' : ''}"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+
+							{#if userDropdownOpen}
+								<div
+									class="ring-opacity-5 absolute right-0 z-50 mt-2 w-48 rounded-lg bg-white shadow-lg ring-1 ring-black"
+								>
+									<div class="py-1">
+										<a
+											href="/profile"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											onclick={() => (userDropdownOpen = false)}
+										>
+											<svg
+												class="mr-2 inline-block h-4 w-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+												/>
+											</svg>
+											Profile
+										</a>
+										<a
+											href="/my-projects"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											onclick={() => (userDropdownOpen = false)}
+										>
+											<svg
+												class="mr-2 inline-block h-4 w-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+												/>
+											</svg>
+											My Projects
+										</a>
+										<a
+											href="/settings"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											onclick={() => (userDropdownOpen = false)}
+										>
+											<svg
+												class="mr-2 inline-block h-4 w-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+												/>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+												/>
+											</svg>
+											Settings
+										</a>
+										<hr class="my-1 border-gray-200" />
+										<button
+											onclick={logout}
+											class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+										>
+											<svg
+												class="mr-2 inline-block h-4 w-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+												/>
+											</svg>
+											Sign out
+										</button>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<!-- Login/Signup Buttons -->
+						<a
+							href="/auth/login"
+							class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+						>
+							Sign in
+						</a>
+						<a
+							href="/auth/signup"
+							class="rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-4 py-2 text-sm font-medium text-white transition-shadow hover:shadow-lg"
+						>
+							Get started
+						</a>
+					{/if}
+				</div>
+
 				<!-- Mobile menu button -->
 				<div class="flex items-center md:hidden">
 					<button
@@ -125,6 +294,76 @@
 								{item.label}
 							</a>
 						{/each}
+					</div>
+
+					<!-- Mobile Auth Section -->
+					<div class="border-t border-gray-200 pt-4 pb-3">
+						{#if auth.isAuthenticated}
+							<div class="mb-3 px-4">
+								<div class="flex items-center">
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-500"
+									>
+										<span class="text-lg font-semibold text-white">
+											{auth.user?.name?.charAt(0).toUpperCase() || '?'}
+										</span>
+									</div>
+									<div class="ml-3">
+										<div class="text-base font-medium text-gray-800">{auth.user?.name}</div>
+										<div class="text-sm text-gray-500">View profile</div>
+									</div>
+								</div>
+							</div>
+							<div class="space-y-1">
+								<a
+									href="/profile"
+									class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+									onclick={() => (mobileMenuOpen = false)}
+								>
+									Profile
+								</a>
+								<a
+									href="/my-projects"
+									class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+									onclick={() => (mobileMenuOpen = false)}
+								>
+									My Projects
+								</a>
+								<a
+									href="/settings"
+									class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+									onclick={() => (mobileMenuOpen = false)}
+								>
+									Settings
+								</a>
+								<button
+									onclick={() => {
+										logout();
+										mobileMenuOpen = false;
+									}}
+									class="block w-full px-4 py-2 text-left text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+								>
+									Sign out
+								</button>
+							</div>
+						{:else}
+							<div class="space-y-1">
+								<a
+									href="/auth/login"
+									class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+									onclick={() => (mobileMenuOpen = false)}
+								>
+									Sign in
+								</a>
+								<a
+									href="/auth/signup"
+									class="mx-4 block rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-4 py-2 text-center text-base font-medium text-white hover:from-orange-700 hover:to-red-700"
+									onclick={() => (mobileMenuOpen = false)}
+								>
+									Get started
+								</a>
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/if}
