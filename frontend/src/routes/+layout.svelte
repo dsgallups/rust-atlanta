@@ -309,7 +309,7 @@
 										</span>
 									</div>
 									<div class="ml-3">
-										<div class="text-base font-medium text-gray-800">{auth.user?.name}</div>
+										<div class="text-base font-medium text-gray-800">{userName}</div>
 										<div class="text-sm text-gray-500">View profile</div>
 									</div>
 								</div>
