@@ -1,0 +1,11 @@
+// See the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+    "context_servers": {
+        "svelte": {
+            "source": "custom",
+            "command": "npx",
+            "args": ["-y", "@sveltejs/mcp"],
+            "env": {}
+        }
+    }
+}
