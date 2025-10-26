@@ -1,4 +1,4 @@
-use crate::models::users::RegisterParams;
+use crate::models::users::{self, RegisterParams};
 
 pub use super::_entities::user_auths::{ActiveModel, Column, Entity, Model};
 use chrono::{Duration, Local};
@@ -241,6 +241,13 @@ impl Model {
         jwt::JWT::new(secret)
             .generate_token(expiration, self.id.to_string(), Map::new())
             .map_err(ModelError::from)
+    }
+
+    pub async fn load_user(&self, db: &DatabaseConnection) -> ModelResult<users::Model> {
+        users::Entity::find_by_id(self.user_id)
+            .one(db)
+            .await?
+            .ok_or(ModelError::EntityNotFound)
     }
 }
 
