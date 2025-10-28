@@ -2,5 +2,6 @@
 
 pub mod prelude;
 
+pub mod projects;
 pub mod user_auths;
 pub mod users;
