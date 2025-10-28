@@ -1,7 +1,7 @@
 use insta::{assert_debug_snapshot, with_settings};
 use loco_rs::testing::prelude::*;
 use rstest::rstest;
-use rust_atlanta::{app::App, models::users};
+use rust_atlanta::{app::App, models::user_auths};
 use serial_test::serial;
 
 use super::prepare_data;
@@ -36,7 +36,7 @@ async fn can_register() {
             200,
             "Register request should succeed"
         );
-        let saved_user = users::Model::find_by_email(&ctx.db, email).await;
+        let saved_user = user_auths::Model::find_by_email(&ctx.db, email).await;
 
         with_settings!({
             filters => cleanup_user_model()
@@ -84,7 +84,9 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
             "Register request should succeed"
         );
 
-        let user = users::Model::find_by_email(&ctx.db, email).await.unwrap();
+        let user = user_auths::Model::find_by_email(&ctx.db, email)
+            .await
+            .unwrap();
         let email_verification_token = user
             .email_verification_token
             .expect("Email verification token should be generated");
@@ -102,7 +104,7 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
             .await;
 
         // Make sure email_verified_at is set
-        let user = users::Model::find_by_email(&ctx.db, email)
+        let user = user_auths::Model::find_by_email(&ctx.db, email)
             .await
             .expect("Failed to find user by email");
 
@@ -223,7 +225,7 @@ async fn can_reset_password() {
             "Forget request should succeed"
         );
 
-        let user = users::Model::find_by_email(&ctx.db, &login_data.user.email)
+        let user = user_auths::Model::find_by_email(&ctx.db, &login_data.user.email)
             .await
             .expect("Failed to find user by email");
 
@@ -249,7 +251,7 @@ async fn can_reset_password() {
             "Reset password request should succeed"
         );
 
-        let user = users::Model::find_by_email(&ctx.db, &user.email)
+        let user = user_auths::Model::find_by_email(&ctx.db, &user.email)
             .await
             .unwrap();
 
@@ -343,7 +345,7 @@ async fn can_auth_with_magic_link() {
         //     assert_debug_snapshot!(deliveries.messages);
         // });
 
-        let user = users::Model::find_by_email(&ctx.db, "user1@example.com")
+        let user = user_auths::Model::find_by_email(&ctx.db, "user1@example.com")
             .await
             .expect("User should be found");
 
@@ -444,7 +446,7 @@ async fn can_resend_verification_email() {
             "Two emails should have been sent: welcome and re-verification"
         );
 
-        let user = users::Model::find_by_email(&ctx.db, email)
+        let user = user_auths::Model::find_by_email(&ctx.db, email)
             .await
             .expect("User should exist");
 
@@ -473,7 +475,9 @@ async fn cannot_resend_email_if_already_verified() {
         request.post("/api/auth/register").json(&payload).await;
 
         // Verify user
-        let user = users::Model::find_by_email(&ctx.db, email).await.unwrap();
+        let user = user_auths::Model::find_by_email(&ctx.db, email)
+            .await
+            .unwrap();
         if let Some(token) = user.email_verification_token.clone() {
             request.get(&format!("/api/auth/verify/{token}")).await;
         }

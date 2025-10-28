@@ -1,0 +1,17 @@
+---
+source: tests/models/users.rs
+assertion_line: 40
+expression: res
+---
+Err(
+    Exec(
+        SqlxError(
+            Database(
+                SqliteError {
+                    code: 1299,
+                    message: "NOT NULL constraint failed: user_auths.id",
+                },
+            ),
+        ),
+    ),
+)

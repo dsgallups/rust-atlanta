@@ -1,0 +1,6 @@
+- Create projects table (on users)
+- Create event categories table
+- Create events table (on users)
+- Create stars table (user can star a project)
+- Create news categories table
+- Create news table (user can be author)

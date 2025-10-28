@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	// Mock data for featured content
 	const featuredProjects = [
@@ -170,7 +171,7 @@
 				<p class="mt-2 text-gray-600">Amazing projects built by our members</p>
 			</div>
 			<a
-				href="/projects"
+				href={resolve('/projects')}
 				class="flex items-center gap-1 font-medium text-orange-600 hover:text-orange-700"
 			>
 				View all

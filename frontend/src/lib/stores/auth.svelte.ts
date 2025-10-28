@@ -42,7 +42,10 @@ class AuthStore {
 		}
 	}
 
-	async login(data: { token: string; pid: string; name: string; is_verified: boolean }, rememberMe: boolean = false) {
+	async login(
+		data: { token: string; pid: string; name: string; is_verified: boolean },
+		rememberMe: boolean = false
+	) {
 		this.user = {
 			pid: data.pid,
 			name: data.name,
@@ -80,7 +83,7 @@ class AuthStore {
 		try {
 			const response = await fetch('/api/auth/current', {
 				headers: {
-					'Authorization': `Bearer ${this.token}`
+					Authorization: `Bearer ${this.token}`
 				}
 			});
 
@@ -114,7 +117,7 @@ class AuthStore {
 			...options,
 			headers: {
 				...options.headers,
-				'Authorization': `Bearer ${this.token}`
+				Authorization: `Bearer ${this.token}`
 			}
 		});
 	}

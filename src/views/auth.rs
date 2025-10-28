@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-use crate::models::_entities::users;
+use crate::models::{_entities::users, user_auths};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginResponse {
@@ -12,12 +13,12 @@ pub struct LoginResponse {
 
 impl LoginResponse {
     #[must_use]
-    pub fn new(user: &users::Model, token: &String) -> Self {
+    pub fn new(user: &users::Model, user_auth: &user_auths::Model, token: &String) -> Self {
         Self {
             token: token.to_string(),
-            pid: user.pid.to_string(),
+            pid: user_auth.id.to_string(), //pid: user.pid.to_string(),
             name: user.name.clone(),
-            is_verified: user.email_verified_at.is_some(),
+            is_verified: user_auth.email_verified_at.is_some(), //is_verified: user.email_verified_at.is_some(),
         }
     }
 }
@@ -31,9 +32,9 @@ pub struct CurrentResponse {
 
 impl CurrentResponse {
     #[must_use]
-    pub fn new(user: &users::Model) -> Self {
+    pub fn new(user: &users::Model, pid: Uuid) -> Self {
         Self {
-            pid: user.pid.to_string(),
+            pid: pid.to_string(),
             name: user.name.clone(),
             email: user.email.clone(),
         }

@@ -1,12 +1,12 @@
 use axum::http::{HeaderName, HeaderValue};
 use loco_rs::{app::AppContext, TestServer};
-use rust_atlanta::{models::users, views::auth::LoginResponse};
+use rust_atlanta::{models::user_auths, views::auth::LoginResponse};
 
 const USER_EMAIL: &str = "test@loco.com";
 const USER_PASSWORD: &str = "1234";
 
 pub struct LoggedInUser {
-    pub user: users::Model,
+    pub user: user_auths::Model,
     pub token: String,
 }
 
@@ -22,7 +22,7 @@ pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedIn
         .post("/api/auth/register")
         .json(&register_payload)
         .await;
-    let user = users::Model::find_by_email(&ctx.db, USER_EMAIL)
+    let user = user_auths::Model::find_by_email(&ctx.db, USER_EMAIL)
         .await
         .unwrap();
 
@@ -43,7 +43,7 @@ pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedIn
     let login_response: LoginResponse = serde_json::from_str(&response.text()).unwrap();
 
     LoggedInUser {
-        user: users::Model::find_by_email(&ctx.db, USER_EMAIL)
+        user: user_auths::Model::find_by_email(&ctx.db, USER_EMAIL)
             .await
             .unwrap(),
         token: login_response.token,
