@@ -3,6 +3,7 @@
 pub mod prelude;
 
 pub mod events;
+pub mod news;
 pub mod projects;
 pub mod user_auths;
 pub mod users;

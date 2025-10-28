@@ -3,3 +3,4 @@ mod prepare_data;
 
 pub mod projects;
 pub mod events;
+pub mod news;
