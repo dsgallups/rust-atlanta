@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod events;
 pub mod projects;
 pub mod user_auths;
 pub mod users;
