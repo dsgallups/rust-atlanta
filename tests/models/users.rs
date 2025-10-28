@@ -3,7 +3,10 @@ use insta::assert_debug_snapshot;
 use loco_rs::testing::prelude::*;
 use rust_atlanta::{
     app::App,
-    models::users::{self, Model, RegisterParams},
+    models::{
+        user_auths::{self, Model},
+        users::RegisterParams,
+    },
 };
 use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel};
 use serial_test::serial;
@@ -12,7 +15,7 @@ macro_rules! configure_insta {
     ($($expr:expr),*) => {
         let mut settings = insta::Settings::clone_current();
         settings.set_prepend_module_to_snapshot(false);
-        settings.set_snapshot_suffix("users");
+        settings.set_snapshot_suffix("user_auths");
         let _guard = settings.bind_to_scope();
     };
 }
@@ -26,7 +29,7 @@ async fn test_can_validate_model() {
         .await
         .expect("Failed to boot test application");
 
-    let invalid_user = users::ActiveModel {
+    let invalid_user = user_auths::ActiveModel {
         name: ActiveValue::set("1".to_string()),
         email: ActiveValue::set("invalid-email".to_string()),
         ..Default::default()
@@ -335,7 +338,7 @@ async fn magic_link() {
     let magic_link_token = updated_user.magic_link_token.unwrap();
     assert_eq!(
         magic_link_token.len(),
-        users::MAGIC_LINK_LENGTH as usize,
+        user_auths::MAGIC_LINK_LENGTH as usize,
         "Magic link token length does not match expected length"
     );
 
@@ -345,7 +348,7 @@ async fn magic_link() {
     );
 
     let now = Local::now();
-    let should_expired_at = now + Duration::minutes(users::MAGIC_LINK_EXPIRATION_MIN.into());
+    let should_expired_at = now + Duration::minutes(user_auths::MAGIC_LINK_EXPIRATION_MIN.into());
     let actual_expiration = updated_user.magic_link_expiration.unwrap();
 
     assert!(
